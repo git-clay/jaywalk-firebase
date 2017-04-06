@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/git-clay/jaywalk-firebase/issues"
   },
-  "homepage": "https://github.com/git-clay/jaywalk-firebase#readme"
+  "homepage": "https://github.com/git-clay/jaywalk-firebase#readme",
+  "dependencies": {
+    "firebase": "^3.7.5"
+  }
 }
