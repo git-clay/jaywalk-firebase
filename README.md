@@ -10,6 +10,9 @@ $ firebase serve   # Start development server
 Docs for cloud storage:
 https://firebase.google.com/docs/storage/web/start
 
+look into cloud functions
+https://firebase.google.com/docs/functions/
+
 /*
 firebase.auth() - Authentication
 firebase.storage() - Cloud Storage
