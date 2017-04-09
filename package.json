@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/git-clay/jaywalk-firebase#readme",
   "dependencies": {
-    "firebase": "^3.7.5"
+    "firebase": "^3.7.5",
+    "google-cloud": "^0.50.0",
+    "request": "^2.81.0"
   }
 }
