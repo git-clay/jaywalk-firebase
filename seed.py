@@ -3,12 +3,12 @@
 import pyrebase
 import os
 import requests
-import json
-import urllib
-from flask import make_response
+# from flask import make_response
 from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
+import firebase_admin
+from firebase_admin import credentials
 
+load_dotenv(find_dotenv())
 apiKey = os.environ.get("apiKey")
 authDomain = os.environ.get("authDomain")
 databaseURL = os.environ.get("databaseURL")
@@ -19,14 +19,18 @@ config = {
     "apiKey": apiKey,
     "authDomain": authDomain,
     "databaseURL": databaseURL,
-    "storageBucket": storageBucket
+    "storageBucket": storageBucket,
+    "serviceAccount": "./serviceAccount.json"
 }
 
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
+# Get a reference to the auth service
+auth = firebase.auth()
 
 
 def templates_dir():
+    """Might not need."""
     template_dir = "var/www/loader/loader/templates/"
     template_dir = "templates/"
     return template_dir
@@ -43,7 +47,7 @@ def get_deal(deal_id):
     """Get deal."""
     query = build_url("tables/1/rows?id=" + deal_id + "&")
     res = requests.get(query)
-    t_dir = templates_dir()
+# t_dir = templates_dir()
     o = res.json()
     row = o[0]
     try:
@@ -64,6 +68,7 @@ def get_deal(deal_id):
         'author_id': row['_author_id'],
         'category': category,
     }
+    db.child("test").push(context)
     return context
 
 print (get_deal('270'))
