@@ -12,6 +12,8 @@ https://firebase.google.com/docs/storage/web/start
 look into cloud functions
 https://firebase.google.com/docs/functions/
 
+catch all tutorial!
+https://blog.devcolor.org/heating-up-with-firebase-tutorial-on-how-to-integrate-firebase-into-your-app-6ce97440175d
 
 
 
@@ -25,3 +27,4 @@ project_id (for kinetise)
 token (for kinetise)
 
 Also, you need a serviceAccount.json for firebase authentication
+https://console.firebase.google.com/iam-admin/serviceaccounts

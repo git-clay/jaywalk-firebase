@@ -5,16 +5,20 @@ import os
 import requests
 # from flask import make_response
 from dotenv import load_dotenv, find_dotenv
-import firebase_admin
-from firebase_admin import credentials
+# import firebase_admin
+# from firebase_admin import credentials
 
+# firebase variables hidden in .env
 load_dotenv(find_dotenv())
 apiKey = os.environ.get("apiKey")
 authDomain = os.environ.get("authDomain")
 databaseURL = os.environ.get("databaseURL")
 storageBucket = os.environ.get("storageBucket")
+# kinetise variables hidden in .env
 project_id = os.environ.get("project_id")
 token = os.environ.get("token")
+
+# config for pyrebase/firebase keys
 config = {
     "apiKey": apiKey,
     "authDomain": authDomain,
@@ -26,7 +30,7 @@ config = {
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 # Get a reference to the auth service
-auth = firebase.auth()
+# auth = firebase.auth()
 
 
 def templates_dir():
@@ -69,6 +73,8 @@ def get_deal(deal_id):
         'category': category,
     }
     db.child("test").push(context)
+    print context
     return context
 
-print (get_deal('270'))
+get_deal('270')
+# need to create loop to get each snap from kinetise
