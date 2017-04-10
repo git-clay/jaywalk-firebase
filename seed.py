@@ -5,6 +5,8 @@ import os
 import requests
 # from flask import make_response
 from dotenv import load_dotenv, find_dotenv
+from geopy.geocoders import Nominatim
+
 # import firebase_admin
 # from firebase_admin import credentials
 
@@ -33,13 +35,6 @@ db = firebase.database()
 # auth = firebase.auth()
 
 
-def templates_dir():
-    """Might not need."""
-    template_dir = "var/www/loader/loader/templates/"
-    template_dir = "templates/"
-    return template_dir
-
-
 def build_url(command):
     """Create url to access kinetise."""
     host = "https://api-cms-fitrock.kinetise.com/"
@@ -47,34 +42,71 @@ def build_url(command):
     return query
 
 
-def get_deal(deal_id):
-    """Get deal."""
-    query = build_url("tables/1/rows?id=" + deal_id + "&")
+def build_table():
+    """Return all snap objects in kinetise db."""
+    query = build_url("tables/1/rows/get-table?")
     res = requests.get(query)
-# t_dir = templates_dir()
     o = res.json()
-    row = o[0]
-    try:
-        category = row['category']['related_rows']
-    except:
-        category = 0
-
-    context = {
-        'title': 'WalkTo Deal',
-        'description': row['description'],
-        'openinghours': row['openinghours'],
-        'picture': row['picture'],
-        'address': row['address'],
-        'latitude': row['latitude'],
-        'longitude': row['longitude'],
-        'venue_title': row['title'],
-        'id': row['id'],
-        'author_id': row['_author_id'],
-        'category': category,
-    }
-    db.child("test").push(context)
-    print context
+    # context equals all snap objects
+    context = o['results']
+    # lines equalts number of objects in list
+    lines = len(o['results'])
+    manage_deals(lines, context)
     return context
 
-get_deal('270')
+
+def manage_deals(lines, context):
+    """Loop through table from build_table."""
+    new_list = context[0:lines]
+    total_sent = 0
+
+    geolocator = Nominatim()
+
+    for lines in new_list:
+        if lines['_author_email'] is None:
+            email = ""
+        else:
+            email = lines["_author_email"]
+        if lines['_author_first_name'] is None:
+            first_name = ""
+        else:
+            first_name = lines['_author_first_name']
+
+        cat = lines['category_details_name']
+
+        picture = lines['picture']
+        id = lines['id']
+
+        if lines['description'] is None:
+            descr = "Spotted in the wild"
+        else:
+            descr = lines['description']
+
+        try:
+            lines['title']
+        except NoneType:
+            title = "None"
+        else:
+            title = lines['title']
+
+        lat = str(lines['latitude'])
+        lon = str(lines['longitude'])
+        location = geolocator.reverse(lat + "," + lon)
+        # location.raw is an object that returns address estimation
+        # fix_address(location, lines['id'],lat,lon,title)
+        
+        # pushes to firebase db
+        db.child("test2").push(lines)
+        print (lines)
+        try:
+            location.address
+        except NoneType:
+            loc = "Unknown address"
+        else:
+            loc = location.address
+
+        total_sent = total_sent + 1
+
+    return str(total_sent) + " sent"
+build_table()
 # need to create loop to get each snap from kinetise
