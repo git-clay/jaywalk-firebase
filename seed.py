@@ -94,7 +94,7 @@ def manage_deals(lines, context):
         location = geolocator.reverse(lat + "," + lon)
         # location.raw is an object that returns address estimation
         # fix_address(location, lines['id'],lat,lon,title)
-        
+
         # pushes to firebase db
         db.child("test2").push(lines)
         print (lines)
