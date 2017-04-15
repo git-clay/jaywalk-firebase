@@ -5,11 +5,8 @@ import os
 # import requests
 from dotenv import load_dotenv, find_dotenv
 from geopy.geocoders import Nominatim
-
+from radius import get_radius
 # from kineTable import build_categories_table, build_snap_table
-
-# import firebase_admin
-# from firebase_admin import credentials
 
 # firebase variables hidden in .env
 load_dotenv(find_dotenv())
@@ -39,7 +36,7 @@ db = firebase.database()
 
 def snap_table(lines, context):
     """Loop through table from build_table."""
-    new_list = context[0:1]
+    new_list = context[0:lines]
     total_sent = 0
     snap_obj = {
         "snap_id": "",
@@ -47,65 +44,52 @@ def snap_table(lines, context):
         "lat": "",
         "lng": "",
         "address": "",
-        "radi": "",
-        "tags": "",
+        "radi": [],
+        "location": [],
+        "tag_ids": [],
         "description": "",
         "timestamp": "",
-        "address": "",
-        "pic": "",
+        "picture": "",
         "start_time": "",
         "end_time": "",
         "user_id": "",
-        "business_name": ""
+        "business_hours": ""
     }
     geolocator = Nominatim()
 
-    for lines in new_list:
+    for line in new_list:
+        """pushes to tag array"""
+        # for ids in line["category_details_id"]:
+        #     snap_obj["tag_ids"].append(ids)
 
-        # snap_obj['tag_id'] = lines['id']
-        # snap_obj['name'] = lines['name']
-        # snap_obj['total_used'] = ''
-        # snap_obj['locations_used'] = []
-        # snap_obj['days_ranked'] = []
-        # snap_obj['times_ranked'] = []
-        # snap_obj['pin'] = lines['pin']
-        # snap_obj['free_pin'] = lines['free_pin']
-        if lines['_author_id'] is None:
-            first_name = ""
-        else:
-            userId = lines['_author_id']
+        """return address guess from geolocator"""
+        lat = str(line['latitude'])
+        lng = str(line['longitude'])
+        location = geolocator.reverse(lat + "," + lng)
 
-        cat = lines['category_details_name']
-
-        picture = lines['picture']
-        id = lines['id']
-
-        if lines['description'] is None:
-            descr = "Spotted in the wild"
-        else:
-            descr = lines['description']
-
-        try:
-            lines['title']
-        except NoneType:
-            title = "None"
-        else:
-            title = lines['title']
-
-        lat = str(lines['latitude'])
-        lon = str(lines['longitude'])
-        location = geolocator.reverse(lat + "," + lon)
+        """return 6 point radius from origin"""
+        radius = get_radius(line["latitude"], line["longitude"])
+        # print(line)
+        """adding to object that is pushed to firebase"""
+        snap_obj["snap_id"] = line["id"]
+        snap_obj["title"] = line["title"]
+        snap_obj["lat"] = lat
+        snap_obj["lng"] = lng
+        snap_obj["radi"] = radius
+        snap_obj["address"] = line["address"]
+        snap_obj["description"] = line["description"]
+        snap_obj["timestamp"] = line["_created_ts"]
+        snap_obj["picture"] = line["picture"]
+        snap_obj["start_time"] = line["start_time"]
+        snap_obj["end_time"] = line["end_time"]
+        snap_obj["user_id"] = line["_author_id"]
+        snap_obj["business_hours"] = line["openinghours"]
+        snap_obj["location"] = location.address
 
         # pushes to firebase db
-        # db.child("testsnaps").child(lines['id']).set(lines)
-        print (lines)
-        try:
-            location.address
-        except NoneType:
-            loc = "Unknown address"
-        else:
-            loc = location.address
-
+        db.child("testsnaps").child(line['id']).set(snap_obj)
+        print (line['id'])
         total_sent = total_sent + 1
+        print(str(total_sent) + " sent")
 
-    return str(total_sent) + " sent"
+    return

@@ -30,7 +30,7 @@ def build_snap_table():
     lines = len(o['results'])
 
     snap_table(lines, context)
-    return context
+    return
 
 
 def build_categories_table():
@@ -42,10 +42,13 @@ def build_categories_table():
 
     lines = len(o['results'])
     tag_table(lines, category)
-    return (category)
+    return
 
 """Uncomment 'build_categories_table' to seed tags object in db"""
 # build_categories_table()
 
 """Uncomment 'build_snap_table' to seed snaps object in db"""
 build_snap_table()
+
+"""Uncomment 'build_user_table' to seed users object in db"""
+# build_user_table()
