@@ -59,8 +59,8 @@ def snap_table(lines, context):
 
     for line in new_list:
         """pushes to tag array"""
-        # for ids in line["category_details_id"]:
-        #     snap_obj["tag_ids"].append(ids)
+        for ids in line["category_details_id"]:
+            snap_obj["tag_ids"].append(ids)
 
         """return address guess from geolocator"""
         lat = str(line['latitude'])
@@ -87,7 +87,7 @@ def snap_table(lines, context):
         snap_obj["location"] = location.address
 
         # pushes to firebase db
-        db.child("testsnaps").child(line['id']).set(snap_obj)
+        db.child("snaps").child(line['id']).set(snap_obj)
         print (line['id'])
         total_sent = total_sent + 1
         print(str(total_sent) + " sent")
