@@ -28,10 +28,27 @@
 # db.update(data)
 
 # RETRIEVE DATA
+"""eventsRef.orderFunction().queryFunction();"""
+
+"""
+orderFunctions:
+orderByKey()
+orderByChild('child_property')
+orderByValue()
+"""
+"""
+queryFunctions:
+startAt('value')
+endAt('value')
+equalTo('child_key')
+limitToFirst(10)
+limitToLast(10)
+"""
 
 # val
 # users = db.child("users").get()
-# print(users.val()) # {"Morty": {"name": "Mortimer 'Morty' Smith"},
+# print(users.val())
+# {"Morty": {"name": "Mortimer 'Morty' Smith"},
 # "Rick": {"name": "Rick Sanchez"}}
 
 # key

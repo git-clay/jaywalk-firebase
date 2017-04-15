@@ -2,10 +2,11 @@
 # https://github.com/thisbejim/Pyrebase
 import pyrebase
 import os
-import requests
-# from flask import make_response
+# import requests
 from dotenv import load_dotenv, find_dotenv
 from geopy.geocoders import Nominatim
+
+# from kineTable import build_categories_table, build_snap_table
 
 # import firebase_admin
 # from firebase_admin import credentials
@@ -16,9 +17,6 @@ apiKey = os.environ.get("apiKey")
 authDomain = os.environ.get("authDomain")
 databaseURL = os.environ.get("databaseURL")
 storageBucket = os.environ.get("storageBucket")
-# kinetise variables hidden in .env
-project_id = os.environ.get("project_id")
-token = os.environ.get("token")
 
 # config for pyrebase/firebase keys
 config = {
@@ -35,42 +33,47 @@ db = firebase.database()
 # auth = firebase.auth()
 
 
-def build_url(command):
-    """Create url to access kinetise."""
-    host = "https://api-cms-fitrock.kinetise.com/"
-    query = host + "api/kinetise/v2/projects/" + project_id + "/" + command + "access_token=" + token
-    return query
+"""Need to divide out table."""
+"""Users, snaps, tags. Maybe more?"""
 
 
-def build_table():
-    """Return all snap objects in kinetise db."""
-    query = build_url("tables/1/rows/get-table?")
-    res = requests.get(query)
-    o = res.json()
-    # context equals all snap objects
-    context = o['results']
-    # lines equalts number of objects in list
-    lines = len(o['results'])
-    manage_deals(lines, context)
-    return context
-
-
-def manage_deals(lines, context):
+def snap_table(lines, context):
     """Loop through table from build_table."""
-    new_list = context[0:lines]
+    new_list = context[0:1]
     total_sent = 0
-
+    snap_obj = {
+        "snap_id": "",
+        "title": "",
+        "lat": "",
+        "lng": "",
+        "address": "",
+        "radi": "",
+        "tags": "",
+        "description": "",
+        "timestamp": "",
+        "address": "",
+        "pic": "",
+        "start_time": "",
+        "end_time": "",
+        "user_id": "",
+        "business_name": ""
+    }
     geolocator = Nominatim()
 
     for lines in new_list:
-        if lines['_author_email'] is None:
-            email = ""
-        else:
-            email = lines["_author_email"]
-        if lines['_author_first_name'] is None:
+
+        # snap_obj['tag_id'] = lines['id']
+        # snap_obj['name'] = lines['name']
+        # snap_obj['total_used'] = ''
+        # snap_obj['locations_used'] = []
+        # snap_obj['days_ranked'] = []
+        # snap_obj['times_ranked'] = []
+        # snap_obj['pin'] = lines['pin']
+        # snap_obj['free_pin'] = lines['free_pin']
+        if lines['_author_id'] is None:
             first_name = ""
         else:
-            first_name = lines['_author_first_name']
+            userId = lines['_author_id']
 
         cat = lines['category_details_name']
 
@@ -92,11 +95,9 @@ def manage_deals(lines, context):
         lat = str(lines['latitude'])
         lon = str(lines['longitude'])
         location = geolocator.reverse(lat + "," + lon)
-        # location.raw is an object that returns address estimation
-        # fix_address(location, lines['id'],lat,lon,title)
 
         # pushes to firebase db
-        db.child("test2").push(lines)
+        # db.child("testsnaps").child(lines['id']).set(lines)
         print (lines)
         try:
             location.address
@@ -108,5 +109,3 @@ def manage_deals(lines, context):
         total_sent = total_sent + 1
 
     return str(total_sent) + " sent"
-build_table()
-# need to create loop to get each snap from kinetise
