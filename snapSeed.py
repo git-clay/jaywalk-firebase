@@ -59,6 +59,7 @@ def snap_table(lines, context):
 
     for line in new_list:
         """pushes to tag array"""
+        snap_obj["tag_ids"] = []
         for ids in line["category_details_id"]:
             snap_obj["tag_ids"].append(ids)
 
